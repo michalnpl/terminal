@@ -1117,7 +1117,7 @@ namespace winrt::TerminalApp::implementation
         _newTabButton.Flyout().ShowAt(_newTabButton);
     }
 
-    void TerminalPage::_OpenNewTerminalViaDropdown(const NewTerminalArgs newTerminalArgs, const bool forceElevated)
+    void TerminalPage::_OpenNewTerminalViaDropdown(const NewTerminalArgs newTerminalArgs, const bool uiElevationRequested)
     {
         // if alt is pressed, open a pane
         const auto window = CoreWindow::GetForCurrentThread();
@@ -1145,7 +1145,7 @@ namespace winrt::TerminalApp::implementation
                         WI_IsFlagSet(lAltState, CoreVirtualKeyStates::Down) &&
                         WI_IsFlagSet(rAltState, CoreVirtualKeyStates::Down);
 
-        const auto dispatchToElevatedWindow = (ctrlPressed || forceElevated) && !IsRunningElevated();
+        const auto dispatchToElevatedWindow = (ctrlPressed || uiElevationRequested) && !IsRunningElevated();
 
         if ((shiftPressed || dispatchToElevatedWindow) && !debugTap)
         {
