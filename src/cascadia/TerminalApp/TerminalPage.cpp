@@ -1047,6 +1047,9 @@ namespace winrt::TerminalApp::implementation
         auto elevatedRun = WUX::Documents::Run();
         elevatedRun.Text(RS_(L"ElevatedRun/Text"));
         elevatedRun.FontStyle(FontStyle::Italic);
+        auto moreOptions = WUX::Documents::Run();
+        moreOptions.Text(RS_(L"ProfileContextMenu/MoreOptions/Text"));
+        moreOptions.FontStyle(FontStyle::Italic);
 
         auto textBlock = WUX::Controls::TextBlock{};
         textBlock.Inlines().Append(newTabRun);
@@ -1056,6 +1059,8 @@ namespace winrt::TerminalApp::implementation
         textBlock.Inlines().Append(newWindowRun);
         textBlock.Inlines().Append(WUX::Documents::LineBreak{});
         textBlock.Inlines().Append(elevatedRun);
+        textBlock.Inlines().Append(WUX::Documents::LineBreak{});
+        textBlock.Inlines().Append(moreOptions);
 
         auto toolTip = WUX::Controls::ToolTip{};
         toolTip.Content(textBlock);
@@ -1064,10 +1069,26 @@ namespace winrt::TerminalApp::implementation
         profileMenuItem.Click([profileIndex, weakThis{ get_weak() }](auto&&, auto&&) {
             if (auto page{ weakThis.get() })
             {
-                NewTerminalArgs newTerminalArgs{ profileIndex };
+                const NewTerminalArgs newTerminalArgs{ profileIndex };
                 page->_OpenNewTerminalViaDropdown(newTerminalArgs);
             }
         });
+
+        const WUX::Controls::MenuFlyoutItem contextMenuItem{};
+        contextMenuItem.Text(RS_(L"ProfileContextMenu/ElevatedRunFrom/Text"));
+        const WUX::Controls::MenuFlyout contextMenu{};
+        contextMenu.Placement(WUX::Controls::Primitives::FlyoutPlacementMode::BottomEdgeAlignedLeft);
+        contextMenu.Items().Append(contextMenuItem);
+        profileMenuItem.ContextFlyout(contextMenu);
+
+        contextMenuItem.Click([profileIndex, weakThis{ get_weak() }](auto&&, auto&&)
+            {
+                if (const auto page{ weakThis.get() })
+                {
+                    const NewTerminalArgs newTerminalArgs{ profileIndex };
+                    page->_OpenNewTerminalViaDropdown(newTerminalArgs, true);
+                }
+            });
 
         return profileMenuItem;
     }
@@ -1096,7 +1117,7 @@ namespace winrt::TerminalApp::implementation
         _newTabButton.Flyout().ShowAt(_newTabButton);
     }
 
-    void TerminalPage::_OpenNewTerminalViaDropdown(const NewTerminalArgs newTerminalArgs)
+    void TerminalPage::_OpenNewTerminalViaDropdown(const NewTerminalArgs newTerminalArgs, const bool forceElevated)
     {
         // if alt is pressed, open a pane
         const auto window = CoreWindow::GetForCurrentThread();
@@ -1124,7 +1145,7 @@ namespace winrt::TerminalApp::implementation
                         WI_IsFlagSet(lAltState, CoreVirtualKeyStates::Down) &&
                         WI_IsFlagSet(rAltState, CoreVirtualKeyStates::Down);
 
-        const auto dispatchToElevatedWindow = ctrlPressed && !IsRunningElevated();
+        const auto dispatchToElevatedWindow = (ctrlPressed || forceElevated) && !IsRunningElevated();
 
         if ((shiftPressed || dispatchToElevatedWindow) && !debugTap)
         {

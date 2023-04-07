@@ -427,6 +427,12 @@
   <data name="ElevatedRun.Text" xml:space="preserve">
     <value>Ctrl+Click to open as administrator</value>
   </data>
+  <data name="ProfileContextMenu.MoreOptions.Text" xml:space="preserve">
+    <value>Right click for more options</value>
+  </data>
+  <data name="ProfileContextMenu.ElevatedRunFrom.Text" xml:space="preserve">
+    <value>Run as administrator</value>
+  </data>
   <data name="WindowCloseButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
     <value>Close</value>
   </data>
