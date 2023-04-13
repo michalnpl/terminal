@@ -1237,7 +1237,8 @@ namespace winrt::TerminalApp::implementation
                                                                                  nullptr,
                                                                                  settings.InitialRows(),
                                                                                  settings.InitialCols(),
-                                                                                 winrt::guid());
+                                                                                 winrt::guid(),
+                                                                                 profile.Guid());
 
             if constexpr (Feature_VtPassthroughMode::IsEnabled())
             {
@@ -1249,12 +1250,9 @@ namespace winrt::TerminalApp::implementation
 
         else
         {
-            // profile is guaranteed to exist here
-            auto guidWString = Utils::GuidToString(profile.Guid());
-
-            StringMap envMap{};
-            envMap.Insert(L"WT_PROFILE_ID", guidWString);
-            envMap.Insert(L"WSLENV", L"WT_PROFILE_ID");
+            const auto environment = settings.EnvironmentVariables() != nullptr ?
+                                         settings.EnvironmentVariables().GetView() :
+                                         nullptr;
 
             // Update the path to be relative to whatever our CWD is.
             //
@@ -1285,10 +1283,11 @@ namespace winrt::TerminalApp::implementation
             auto valueSet = TerminalConnection::ConptyConnection::CreateSettings(settings.Commandline(),
                                                                                  newWorkingDirectory,
                                                                                  settings.StartingTitle(),
-                                                                                 envMap.GetView(),
+                                                                                 environment,
                                                                                  settings.InitialRows(),
                                                                                  settings.InitialCols(),
-                                                                                 winrt::guid());
+                                                                                 winrt::guid(),
+                                                                                 profile.Guid());
 
             valueSet.Insert(L"passthroughMode", Windows::Foundation::PropertyValue::CreateBoolean(settings.VtPassthrough()));
             valueSet.Insert(L"reloadEnvironmentVariables",
