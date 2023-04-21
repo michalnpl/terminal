@@ -353,7 +353,7 @@
         // Application-level Keys
         { "command": "closeWindow", "keys": "alt+f4" },
         { "command": "toggleFullscreen", "keys": "alt+enter" },
-        { "command": "toggleFullscreen", "keys": "f11" },
+        { "command": "toggleFullscreen", "keys": "f10" },
         { "command": "toggleFocusMode" },
         { "command": "toggleAlwaysOnTop" },
         { "command": "openNewTabDropdown", "keys": "ctrl+shift+space" },
@@ -378,6 +378,7 @@
         // Tab Management
         // "command": "closeTab" is unbound by default.
         //   The closeTab command closes a tab without confirmation, even if it has multiple panes.
+      { "command": "closeTab", "keys": "ctrl+w" },
         { "command": "closeOtherTabs" },
         { "command": "closeTabsAfter" },
         { "command": { "action" : "moveTab", "direction": "forward" }},

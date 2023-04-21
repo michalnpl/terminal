@@ -880,6 +880,7 @@ namespace winrt::TerminalApp::implementation
             // Manually bubble the OnDirectKeyEvent event up through the focus tree.
             auto xamlRoot{ _root->XamlRoot() };
             auto focusedObject{ Windows::UI::Xaml::Input::FocusManager::GetFocusedElement(xamlRoot) };
+            bool second = false;
             do
             {
                 if (auto keyListener{ focusedObject.try_as<IDirectKeyListener>() })
@@ -905,12 +906,21 @@ namespace winrt::TerminalApp::implementation
                         if (!focusedObject)
                         {
                             focusedObject = _root.try_as<IInspectable>();
+                            if (second)
+                            {
+                                //break;
+                            }
+                            second = true;
+                        }
+                        else
+                        {
+                            //break;
                         }
                     }
                 }
                 else
                 {
-                    break; // we hit a non-FE object, stop bubbling.
+                    //break; // we hit a non-FE object, stop bubbling.
                 }
             } while (focusedObject);
         }
