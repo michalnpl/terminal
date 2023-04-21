@@ -1070,15 +1070,14 @@ namespace winrt::TerminalApp::implementation
         adminIcon.Symbol(WUX::Controls::Symbol::Admin);
         runAsAdminMenuItem.Icon(adminIcon);
 
-        runAsAdminMenuItem.Click([profileIndex, weakThis{ get_weak() }](auto&&, auto&&)
+        runAsAdminMenuItem.Click([profileIndex, weakThis{ get_weak() }](auto&&, auto&&) {
+            if (const auto page{ weakThis.get() })
             {
-                if (const auto page{ weakThis.get() })
-                {
-                    const NewTerminalArgs newTerminalArgs{ profileIndex };
-                    newTerminalArgs.Elevate(true);
-                    page->_OpenNewTerminalViaDropdown(newTerminalArgs);
-                }
-            });
+                const NewTerminalArgs newTerminalArgs{ profileIndex };
+                newTerminalArgs.Elevate(true);
+                page->_OpenNewTerminalViaDropdown(newTerminalArgs);
+            }
+        });
 
         return profileMenuItem;
     }
