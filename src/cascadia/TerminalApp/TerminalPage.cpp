@@ -1074,14 +1074,18 @@ namespace winrt::TerminalApp::implementation
             }
         });
 
-        const WUX::Controls::MenuFlyoutItem contextMenuItem{};
-        contextMenuItem.Text(RS_(L"ProfileContextMenu/ElevatedRunFrom/Text"));
-        const WUX::Controls::MenuFlyout contextMenu{};
-        contextMenu.Placement(WUX::Controls::Primitives::FlyoutPlacementMode::BottomEdgeAlignedLeft);
-        contextMenu.Items().Append(contextMenuItem);
-        profileMenuItem.ContextFlyout(contextMenu);
+        const WUX::Controls::MenuFlyout runAsAdminContextMenu{};
+        runAsAdminContextMenu.Placement(WUX::Controls::Primitives::FlyoutPlacementMode::BottomEdgeAlignedLeft);
+        const WUX::Controls::MenuFlyoutItem runAsAdminMenuItem{};
+        runAsAdminMenuItem.Text(RS_(L"ProfileContextMenu/ElevatedRunFrom/Text"));
+        runAsAdminContextMenu.Items().Append(runAsAdminMenuItem);
+        profileMenuItem.ContextFlyout(runAsAdminContextMenu);
+        runAsAdminContextMenu.ShowAt(profileMenuItem);
+        const WUX::Controls::SymbolIcon adminIcon{};
+        adminIcon.Symbol(WUX::Controls::Symbol::Admin);
+        runAsAdminMenuItem.Icon(adminIcon);
 
-        contextMenuItem.Click([profileIndex, weakThis{ get_weak() }](auto&&, auto&&)
+        runAsAdminMenuItem.Click([profileIndex, weakThis{ get_weak() }](auto&&, auto&&)
             {
                 if (const auto page{ weakThis.get() })
                 {
