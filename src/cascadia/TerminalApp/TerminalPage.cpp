@@ -1134,7 +1134,7 @@ namespace winrt::TerminalApp::implementation
                         WI_IsFlagSet(lAltState, CoreVirtualKeyStates::Down) &&
                         WI_IsFlagSet(rAltState, CoreVirtualKeyStates::Down);
 
-        const bool elevate = newTerminalArgs.Elevate() ? newTerminalArgs.Elevate().Value() : false;
+        const auto elevate = newTerminalArgs.Elevate() ? newTerminalArgs.Elevate().Value() : false;
         const auto dispatchToElevatedWindow = (elevate || ctrlPressed) && !IsRunningElevated();
 
         if ((shiftPressed || dispatchToElevatedWindow) && !debugTap)
