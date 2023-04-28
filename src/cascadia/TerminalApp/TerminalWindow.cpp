@@ -875,19 +875,19 @@ namespace winrt::TerminalApp::implementation
                             focusedObject = _root.try_as<IInspectable>();
                             if (second)
                             {
-                                //break;
+                                break;
                             }
                             second = true;
                         }
                         else
                         {
-                            //break;
+                            break;
                         }
                     }
                 }
                 else
                 {
-                    //break; // we hit a non-FE object, stop bubbling.
+                    break; // we hit a non-FE object, stop bubbling.
                 }
             } while (focusedObject);
         }
