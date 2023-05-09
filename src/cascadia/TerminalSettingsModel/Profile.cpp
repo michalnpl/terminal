@@ -198,13 +198,68 @@ void Profile::LayerJson(const Json::Value& json)
     }
 }
 
+static std::wstring expand_environment_variables(const std::wstring& input_path, std::error_code& ec) {
+    DWORD required_buffer_size = ExpandEnvironmentStringsW(input_path.c_str(), nullptr, 0);
+    if (required_buffer_size == 0) {
+        ec.assign(GetLastError(), std::system_category());
+        return std::wstring();
+    }
+
+    std::vector<wchar_t> buffer(required_buffer_size);
+    DWORD result = ExpandEnvironmentStringsW(input_path.c_str(), buffer.data(), static_cast<DWORD>(buffer.size()));
+    if (result > 0 && result <= buffer.size()) {
+        ec.clear();
+        return std::wstring(buffer.data());
+    }
+
+    ec.assign(GetLastError(), std::system_category());
+    return std::wstring();
+}
+
+static std::wstring normalize_path(const std::wstring& input_path, std::error_code& ec) {
+    std::wstring expanded_path = expand_environment_variables(input_path, ec);
+    if (expanded_path.empty()) {
+        return std::wstring();
+    }
+
+    DWORD required_buffer_size = GetFullPathNameW(expanded_path.c_str(), 0, nullptr, nullptr);
+    if (required_buffer_size == 0) {
+        ec.assign(GetLastError(), std::system_category());
+        return std::wstring();
+    }
+
+    std::vector<wchar_t> buffer(required_buffer_size);
+    DWORD result = GetFullPathNameW(expanded_path.c_str(), static_cast<DWORD>(buffer.size()), buffer.data(), nullptr);
+    if (result > 0 && result <= buffer.size()) {
+        std::wstring normalized_path(buffer.data());
+
+        // Normalize the drive letter to uppercase
+        if (normalized_path.size() >= 2 && normalized_path[1] == L':' && std::iswlower(normalized_path[0])) {
+            normalized_path[0] = std::towupper(normalized_path[0]);
+        }
+
+        ec.clear();
+        return normalized_path;
+    }
+
+    ec.assign(GetLastError(), std::system_category());
+    return std::wstring();
+}
+
 winrt::hstring Profile::EvaluatedStartingDirectory() const
 {
     auto path{ StartingDirectory() };
     if (!path.empty())
     {
-        return winrt::hstring{ Profile::EvaluateStartingDirectory(path.c_str()) };
+        std::error_code ec;
+        std::wstring normalized_path = normalize_path(path.c_str(), ec);
+        return normalized_path.c_str();
     }
+    //else {
+        //std::cerr << "Failed to normalize path. Error code: " << ec.value() << " - " << ec.message() << std::endl;
+    //}
+        //return winrt::hstring{ Profile::EvaluateStartingDirectory(path.c_str()) };
+    //}
     // treated as "inherit directory from parent process"
     return path;
 }
