@@ -1068,6 +1068,7 @@ namespace winrt::TerminalApp::implementation
         runAsAdminContextMenu.Items().Append(runAsAdminMenuItem);
         profileMenuItem.ContextFlyout(runAsAdminContextMenu);
         runAsAdminContextMenu.ShowAt(profileMenuItem);
+        runAsAdminContextMenu.ShouldConstrainToRootBounds(true);
         const WUX::Controls::SymbolIcon adminIcon{};
         adminIcon.Symbol(WUX::Controls::Symbol::Admin);
         runAsAdminMenuItem.Icon(adminIcon);
